@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #282c34;
+            color: white;
+            text-align: center;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #game-container {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 5px;
+            margin: 20px 0;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: #61dafb;
+            color: #282c34;
+            border: 2px solid #282c34;
+            transition: background-color 0.3s ease-in-out;
+      
+        .cell:hover {
+            background-color: #00bcd4;
+        }
+
+        #status {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        #reset-button {
+            background-color: #00bcd4;
+            color: #282c34;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        #reset-button:hover {
+            background-color: #61dafb;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="board" class="clearfix"></div>
+        <div id="status"></div>
+        <button id="reset-button">Reset Game</button>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const board = document.getElementById("board");
+            const status = document.getElementById("status");
+            const resetButton = document.getElementById("reset-button");
+
+            let currentPlayer = "X";
+            let gameBoard = ["", "", "", "", "", "", "", "", ""];
+            let gameActive = true;
+
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6]             // diagonals
+            ];
+
+            const checkWinner = () => {
+                for (const combination of winningCombinations) {
+                    const [a, b, c] = combination;
+                    if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            const checkTie = () => gameBoard.every(cell => cell !== "");
+
+            const handleClick = (index) => {
+                if (!gameActive || gameBoard[index] !== "") return;
+
+                gameBoard[index] = currentPlayer;
+                renderBoard();
+
+                if (checkWinner()) {
+                    status.textContent = `Player ${currentPlayer} wins!`;
+                    gameActive = false;
+                } else if (checkTie()) {
+                    status.textContent = "It's a tie!";
+                    gameActive = false;
+                } else {
+                    currentPlayer = currentPlayer === "X" ? "O" : "X";
+                    status.textContent = `Player ${currentPlayer}'s turn`;
+                }
+            };
+
+            const resetGame = () => {
+                gameBoard = ["", "", "", "", "", "", "", "", ""];
+                currentPlayer = "X";
+                gameActive = true;
+                status.textContent = `Player ${currentPlayer}'s turn`;
+                renderBoard();
+            };
+
+            const renderBoard = () => {
+                board.innerHTML = "";
+                gameBoard.forEach((value, index) => {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    cell.textContent = value;
+                    cell.addEventListener("click", () => handleClick(index));
+                    board.appendChild(cell);
+                });
+            };
+
+            resetButton.addEventListener("click", resetGame);
+
+            // Initial render
+            renderBoard();
+            status.textContent = `Player ${currentPlayer}'s turn`;
+        });
+    </script>
+</body>
+</html>
